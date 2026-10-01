@@ -58,8 +58,8 @@ public class Drivetrain extends SubsystemBase {
 
   public void ArcadeDriveCutPower(double xaxisSpeed, double zaxisRotate, boolean cutPowerMode) {
     if (cutPowerMode) {
-      xaxisSpeed *= 0.7;
-      zaxisRotate *= 0.7;
+      xaxisSpeed *= 0;
+      zaxisRotate *= 0;
     }
     m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
   }
