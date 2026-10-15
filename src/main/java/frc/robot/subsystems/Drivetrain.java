@@ -16,6 +16,8 @@ public class Drivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
   private static final double kWheelDiameterInch = 2.75591; // 70 mm
 
+  private double targetHeading;
+
   // The Romi has the left and right motors set to
   // PWM channels 0 and 1 respectively
   private final Spark m_leftMotor = new Spark(0);
@@ -36,6 +38,22 @@ public class Drivetrain extends SubsystemBase {
   // Set up the BuiltInAccelerometer
   private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
 
+  // Set up gyro adjustments
+  private double getGyroAdjudstment() {
+
+    private double headingDifference = m_gyro.getAngleZ() - targetHeading;
+    headingDifference %= 360;
+
+    if (headingDifference < -180) {
+      headingDifference +=360;
+    }
+    if (headingDifference > 180) {
+      headingDifference -= 360;
+    }
+    
+    return headingDifference;
+  }
+
   /** Creates a new Drivetrain. */
   public Drivetrain() {
     SendableRegistry.addChild(m_diffDrive, m_leftMotor);
@@ -50,9 +68,15 @@ public class Drivetrain extends SubsystemBase {
     m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     resetEncoders();
+    targetHeading = m_gyro.getAngleZ();
   }
 
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
+    double gyroAdjust = getGyroAdjudstment();
+    zaxisRotate += gyroAdjust;
+
+
+
     m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
   }
 
